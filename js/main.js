@@ -11,7 +11,7 @@ $(".more_btn").click(function() {
 //This ajax request calls 10 initial sets of random array elements strung together (on page load). 
 $.ajax({
   type: "GET",
-  url: "/js/data.js",
+  url: "http://m8ker.github.io/machinestories/js/data.js",
   dataType: "script",
   success: function(){
 		for (var i = 1; i <= 10; i++) {
@@ -24,7 +24,6 @@ $.ajax({
 		};
   }
 });
-
 /*
 The following ajax request loads additional array elements when the user scrolls to the bottom of the page.
 
@@ -35,13 +34,61 @@ are hidden from fiew above the scrollable area. When $(document).height() - $(wi
 scrollbar position, this means we have scrolled to the bottom of the document.  This is our signal that ajax 
 needs to add additional content to the page. 
 */
-$(window).scroll(function() 
+
+var _throttleTimer = null;
+var _throttleDelay = 100;
+var $window = $(window);
+var $document = $(document);
+
+$document.ready(function () {
+
+    $window
+        .off('scroll', ScrollHandler)
+        .on('scroll', ScrollHandler);
+
+});
+
+function ScrollHandler(e) {
+    //throttle event:
+    clearTimeout(_throttleTimer);
+    _throttleTimer = setTimeout(function () {
+        console.log('scroll');
+
+        //do work
+        if ($window.scrollTop() + $window.height() > $document.height() - 100) {
+                       $.ajax({
+		type: "GET",
+			  url: "http://m8ker.github.io/machinestories/js/data.js",
+			  dataType: "script",
+		success: function() {
+			for (var i = 1; i <= 10; i++) {
+				var random_occ = getRandomArbitrary (0, occupations.length),
+								random_adj = getRandomArbitrary (0, adjectives.length),
+		      random_vrb = getRandomArbitrary (0, verbs.length),
+		      random_adv = getRandomArbitrary (0, adverbs.length),
+								random_emo = getRandomArbitrary (0, emotions.length);
+		$("#postswrapper").append('<p><span class="adj">'+adjectives[random_adj]+"</span>"+" "+occupations[random_occ]+" "+"feeling"+" "+'<span class="emo">'+emotions[random_emo]+"</span>"+","+" "+verbs[random_vrb]+"s"+" "+adverbs[random_adv]+"."+"</p>");
+		  };
+		}
+	    });
+        }
+
+    }, _throttleDelay);
+}
+
+
+
+
+
+
+/*$(window).scroll(function() 
 {
   if($(window).scrollTop() == $(document).height() - $(window).height())
   {
+	  alert("hi");
     $.ajax({
     	type: "GET",
-		  url: "/js/data.js",
+		  url: "http://m8ker.github.io/machinestories/js/data.js",
 		  dataType: "script",
     	success: function() {
     		for (var i = 1; i <= 10; i++) {
@@ -55,6 +102,6 @@ $(window).scroll(function()
     	}
     });
   }
-});
+});*/
 
 
